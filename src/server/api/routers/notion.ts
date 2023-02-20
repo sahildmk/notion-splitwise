@@ -9,6 +9,35 @@ import {
 
 const databaseId = "c396574a71404f5889028d3f423ea86d";
 
+const highlightSchema = z.object({
+  id: z.string(),
+  properties: z.object({
+    Name: z.object({
+      title: z
+        .array(
+          z.object({
+            text: z.object({
+              content: z.string(),
+            }),
+          })
+        )
+        .nonempty(),
+    }),
+  }),
+});
+
+const blockSchema = z.object({
+  paragraph: z
+    .object({
+      rich_text: z.array(
+        z.object({
+          plain_text: z.string(),
+        })
+      ),
+    })
+    .optional(),
+});
+
 export const notionRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const response = await ctx.notion.databases.retrieve({
@@ -47,23 +76,28 @@ export const notionRouter = createTRPCRouter({
       content: string;
     }> = [];
 
-    for (const highlight of unpostedHighlights.results) {
-      const title = highlight.properties?.Name.title[0].text.content;
+    for (const unparsedhighlight of unpostedHighlights.results) {
+      const highlight = highlightSchema.parse(unparsedhighlight);
+      if (highlight === undefined) continue;
+
+      const title = highlight.properties.Name.title[0].text.content;
 
       const content = await ctx.notion.blocks.children.list({
         block_id: highlight.id,
       });
 
       const fullContentString: string[] = [];
-      content.results.forEach((block) => {
+      content.results.forEach((unparsedBlock) => {
         let fullBlockString = "";
-        // console.log(JSON.stringify(block));
+        const block = blockSchema.parse(unparsedBlock);
 
-        block.paragraph?.rich_text.forEach((rt) => {
+        if (block.paragraph === undefined) return;
+
+        block.paragraph.rich_text.forEach((rt) => {
           fullBlockString = fullBlockString.concat(rt.plain_text);
         });
 
-        fullContentString.push(fullBlockString);
+        if (fullBlockString !== "") fullContentString.push(fullBlockString);
       });
 
       result.push({
