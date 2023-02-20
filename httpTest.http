@@ -1,0 +1,3 @@
+GET https://readwise.io/api/v2/highlights/
+Content-Type: application/json
+Authorization: Token KTLqQYwD6mhh56wig5FvSPl9xeGaS22wVpQe0TD1gr30g85zhy

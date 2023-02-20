@@ -38,7 +38,8 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
-    notion
+    notion,
+    readwise,
   };
 };
 
@@ -67,6 +68,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { notion } from "../integrations/notion";
+import { readwise } from "../integrations/readwise";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

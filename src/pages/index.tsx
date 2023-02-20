@@ -21,36 +21,10 @@ const Home: NextPage = () => {
             Notion x Splitwise{" "}
             <span className="text-[hsl(280,100%,70%)]">Sync</span>
           </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
           <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello.data ? hello.data.greeting : "Loading tRPC query..."}
-            </p>
+            {/* <ReadwiseTest /> */}
             <NotionTest />
-            <AuthShowcase />
+            {/* <AuthShowcase /> */}
           </div>
         </div>
       </main>
@@ -61,13 +35,41 @@ const Home: NextPage = () => {
 export default Home;
 
 const NotionTest: React.FC = () => {
-  const result = api.notion.getAll.useQuery();
+  const result = api.notion.getUnpostedHighlights.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  return (
+    <div className="flex flex-col justify-center gap-4 text-white">
+      {result.isFetching ? (
+        <>Loading...</>
+      ) : (
+        result.data?.map((el, idx) => (
+          <div key={idx}>
+            <h1 className="mb-1 text-2xl font-bold">{el.highlightTitle}</h1>
+            <p>{el.content}</p>
+          </div>
+        ))
+      )}
+      <button
+        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+        onClick={() => {
+          result.refetch().catch(console.error);
+        }}
+      >
+        Test Notion Connection
+      </button>
+    </div>
+  );
+};
+
+const ReadwiseTest: React.FC = () => {
+  const result = api.readwise.getAll.useQuery();
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <p>{result.data}</p>
       <button className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20">
-        Test Notion Connection
+        Test Readwise Connection
       </button>
     </div>
   );
