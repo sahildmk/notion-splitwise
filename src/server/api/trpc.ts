@@ -60,6 +60,8 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   });
 };
 
+export type ServiceContext = Awaited<ReturnType<typeof createTRPCContext>>;
+
 /**
  * 2. INITIALIZATION
  *
