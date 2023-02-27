@@ -4,6 +4,7 @@ import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
+import { useState } from "react";
 
 const Home: NextPage = () => {
   return (
@@ -37,6 +38,8 @@ const NotionTest: React.FC = () => {
     refetchOnWindowFocus: false,
   });
 
+  const createHighlightMut = api.notion.createUnpostedHighlights.useMutation();
+
   return (
     <div className="flex flex-col justify-center gap-4 text-white">
       {result.isFetching ? (
@@ -56,6 +59,15 @@ const NotionTest: React.FC = () => {
         }}
       >
         Test Notion Connection
+      </button>
+
+      <button
+        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+        onClick={() => {
+          createHighlightMut.mutate();
+        }}
+      >
+        Test readwise create highlight
       </button>
     </div>
   );

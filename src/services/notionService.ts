@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { type ServiceContext } from "~/server/api/trpc";
+import { notion } from "~/server/integrations/notion";
 
 const databaseId = "c396574a71404f5889028d3f423ea86d";
 
@@ -33,7 +34,7 @@ const blockSchema = z.object({
 });
 
 export const GetUnpostedHighlights = async (ctx: ServiceContext) => {
-  const unpostedHighlights = await ctx.notion.databases.query({
+  const unpostedHighlights = await notion.databases.query({
     database_id: databaseId,
     filter: {
       and: [
@@ -67,7 +68,7 @@ export const GetUnpostedHighlights = async (ctx: ServiceContext) => {
 
     const title = highlight.properties.Name.title[0].text.content;
 
-    const content = await ctx.notion.blocks.children.list({
+    const content = await notion.blocks.children.list({
       block_id: highlight.id,
     });
 
@@ -100,7 +101,7 @@ export const AddDatabseReadwiseLink = async (ctx: ServiceContext) => {
 
   if (!unpostedHighlights || !unpostedHighlights[0]) return;
 
-  const result = await ctx.notion.pages.update({
+  const result = await notion.pages.update({
     page_id: unpostedHighlights[0].id,
     properties: {
       readwise_highlightLink: {
